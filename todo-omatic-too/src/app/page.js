@@ -55,10 +55,10 @@ export default function Home() {
   ]);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gradient-to-br from-gray-600 to-red-500">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="min-h-screen p-8">
-          <h1 className="text-2xl font-bold text-gray-700">Your To-Do Lists</h1>
+          <h1 className="text-2xl font-bold text-white-700">Your To-Do Lists</h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
             {todoLists.map((list) => (
@@ -67,7 +67,7 @@ export default function Home() {
                 className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
               >
                 <h2 className="text-xl font-semibold">{list.title}</h2>
-                <p className="text-gray-200">
+                <p className="text-gray-500">
                   {list.completed} of {list.tasks} tasks completed
                 </p>
                 <ul className="text-gray-200">
