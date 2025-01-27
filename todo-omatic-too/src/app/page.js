@@ -72,7 +72,7 @@ export default function Home() {
                 </p>
                 <ul className="text-gray-200">
                   {list.tasksList.slice(0, 3).map((task, index) => (
-                    <li key={index}>{task}</li>
+                    <li key={index}>- {task}</li>
                   ))}
                   <li>...</li>
                 </ul>
