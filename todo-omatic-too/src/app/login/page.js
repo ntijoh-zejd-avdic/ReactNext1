@@ -40,6 +40,10 @@ const Login = () => {
       if (response.ok) {
         setSuccessMessage(isLogin ? 'Login successful!' : 'Signup successful!');
         setErrorMessage('');
+
+        // Store the JWT token in localStorage
+        localStorage.setItem('authToken', result.token); // Assuming the JWT is in the "token" field
+
         // Redirect user on successful login/signup
         router.push('/');
       } else {

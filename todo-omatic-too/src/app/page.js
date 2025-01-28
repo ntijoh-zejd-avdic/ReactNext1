@@ -1,16 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
 
-  const handleClick = (title) => {
-    router.push(`/checklist/${title.toLowerCase()}`);
-  };
+  const [todoLists, setTodoLists] = useState([]);
+  const token = localStorage.getItem("authToken"); // Get JWT from localStorage
 
-  const [todoLists, setTodoLists] = useState([
+  // Test lists to be used when backend data is not available
+  const defaultTodoLists = [
     {
       id: 1,
       title: "Groceries",
@@ -46,15 +46,59 @@ export default function Home() {
         { name: "Check itinerary", completed: true },
       ],
     },
-  ]);
+  ];
+
+  // Fetch todo lists from the backend
+  useEffect(() => {
+    async function fetchTodoLists() {
+      try {
+        const response = await fetch("http://localhost:3001/lists", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Send JWT in the Authorization header
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTodoLists(data); // Use backend data if available
+        } else {
+          setTodoLists(defaultTodoLists); // Use test data if backend request fails
+        }
+      } catch (error) {
+        console.error("Error fetching todo lists:", error);
+        setTodoLists(defaultTodoLists); // Use test data if error occurs
+      }
+    }
+
+    if (token) {
+      fetchTodoLists();
+    }
+  }, [token]);
+
+  const handleClick = (title) => {
+    router.push(`/checklist/${title.toLowerCase()}`);
+  };
+
+  const handleLoginClick = () => {
+    router.push("/login"); // Navigate to the login page
+  };
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-600 to-red-500">
       {/* Main Content */}
       <div className="grid grid-rows-[1fr] items-center justify-items-center h-full p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-8 items-center sm:items-start">
+        <header className="flex justify-between items-center w-full mb-8">
           <h1 className="text-4xl font-bold text-white">Your To-Do Lists</h1>
+          <button
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            onClick={handleLoginClick}
+          >
+            Go to Login
+          </button>
+        </header>
 
+        <main className="flex flex-col gap-8 items-center sm:items-start">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
             {todoLists.map((list) => {
               const completedCount = list.tasksList.filter(
