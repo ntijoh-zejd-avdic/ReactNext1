@@ -14,7 +14,7 @@ const JWT_SECRET = "your_jwt_secret"; // Use a more secure secret in production
 app.use(
   cors({
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT"],
     credentials: true,
   })
 );
@@ -201,14 +201,60 @@ app.get("/todos/:listId", isAuthenticated, async (req, res) => {
 
 app.post("/todos/:listId", isAuthenticated, async (req, res) => {
   const { listId } = req.params;
-  const { task } = req.body;
+  const name = req.body.name;
   console.log(
-    `Creating todo for list ID: ${listId} with task: ${task} for user ID: ${req.userId}\n`
+    `Creating todo for list ID: ${listId} with task: ${name} for user ID: ${req.userId}\n`
   );
-  const todo = await Todo.create({ task, listId, completed: false });
+  const todo = await Todo.create({ name, listId, completed: false });
   console.log(`Created todo with ID: ${todo.id}\n`);
   res.status(201).json(todo);
 });
+
+app.put("/todos/:listId/:taskId", isAuthenticated, async (req, res) => {
+  const { listId, taskId } = req.params;
+
+  try {
+    console.log(`Toggling task completion for task ID: ${taskId} in list ID: ${listId} for user ID: ${req.userId}\n`);
+
+    // Find the list with the provided listId and check if it belongs to the authenticated user
+    const list = await List.findOne({
+      where: { id: listId, userId: req.userId },
+      include: [
+        {
+          model: Todo,
+          as: "tasksList",
+        },
+      ],
+    });
+
+    if (!list) {
+      return res.status(404).json({ message: "List not found or does not belong to the user" });
+    }
+
+    // Find the task within the list's tasks
+    const task = await Todo.findOne({
+      where: { id: taskId, listId: listId },
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Toggle the completed status
+    task.completed = !task.completed;
+    await task.save(); // Save the updated task
+
+    console.log(`Toggled task with ID: ${taskId} to completed: ${task.completed}\n`);
+
+    // Respond with the updated task
+    res.json(task);
+  } catch (error) {
+    console.error("Error toggling task completion:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 
 // Start the server
 app.listen(port, () => {

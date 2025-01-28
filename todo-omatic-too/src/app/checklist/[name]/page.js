@@ -9,8 +9,9 @@ const ChecklistPage = () => {
 
   const [selectedList, setSelectedList] = useState(null);
   const [error, setError] = useState("");
+  const [newTaskName, setNewTaskName] = useState(""); // State to handle new task input
 
-  const token = localStorage.getItem("authToken"); // Retrieve JWT from localStorage
+  const token = localStorage.getItem("authToken");
 
   // Fetch the selected checklist from the backend
   useEffect(() => {
@@ -20,14 +21,14 @@ const ChecklistPage = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Send JWT in the Authorization header
+            Authorization: `Bearer ${token}`,
           },
         });
 
         if (response.ok) {
           const data = await response.json();
           console.log("Backend response:", data);
-          setSelectedList(data); // Set the fetched checklist data
+          setSelectedList(data);
         } else {
           setError("Checklist not found!");
         }
@@ -48,33 +49,87 @@ const ChecklistPage = () => {
   const handleToggle = async (taskIndex) => {
     if (!selectedList) return;
 
-    console.log(`Currently working with list ${selectedList.name} containing ${selectedList.tasksList}`)
+    const task = selectedList.tasksList[taskIndex];
+    const updatedCompletedStatus = !task.completed;
 
+    // Update task status locally
     const updatedTasksList = selectedList.tasksList.map((task, index) =>
       index === taskIndex
-        ? { ...task, completed: !task.completed }
+        ? { ...task, completed: updatedCompletedStatus }
         : task
     );
 
     const updatedList = { ...selectedList, tasksList: updatedTasksList };
+    setSelectedList(updatedList); // Update frontend immediately
 
     try {
-      const response = await fetch(`http://localhost:3001/lists/${selectedList.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Send JWT in the Authorization header
-        },
-        body: JSON.stringify(updatedList),
-      });
+      const response = await fetch(
+        `http://localhost:3001/todos/${selectedList.id}/${task.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ completed: updatedCompletedStatus }),
+        }
+      );
 
-      if (response.ok) {
-        setSelectedList(updatedList); // Update the state with the toggled task
-      } else {
+      if (!response.ok) {
         console.error("Failed to update task status");
+        // Optionally, revert frontend changes if the request fails
       }
     } catch (err) {
       console.error("Error updating task status:", err);
+    }
+  };
+
+  // Handle adding a new task
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+
+    if (!newTaskName.trim()) {
+      setError("Task name cannot be empty.");
+      return;
+    }
+
+    const newTask = {
+      name: newTaskName, // Adjusted to match backend structure
+    };
+
+    // Add task to frontend
+    const updatedTasksList = [
+      ...selectedList.tasksList,
+      { ...newTask, completed: false },
+    ];
+    const updatedList = { ...selectedList, tasksList: updatedTasksList };
+
+    setSelectedList(updatedList); // Update frontend immediately
+
+    // Send new task to backend
+    try {
+      const response = await fetch(
+        `http://localhost:3001/todos/${selectedList.id}`, // Correct URL with list ID
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newTask), // Sending task object
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to add task to backend.");
+      }
+
+      // Reset task input and error
+      setNewTaskName("");
+      setError("");
+    } catch (err) {
+      console.error("Error adding task:", err);
+      setError("Failed to add task. Please try again.");
     }
   };
 
@@ -86,10 +141,10 @@ const ChecklistPage = () => {
     return <div className="text-center text-gray-500">Loading...</div>;
   }
 
-  console.log(`Currently working with list ${selectedList.name} containing ${selectedList.tasksList}`)
   // Calculate completed tasks
-  const completedCount = selectedList.tasksList.filter((task) => task.completed)
-    .length;
+  const completedCount = selectedList.tasksList.filter(
+    (task) => task.completed
+  ).length;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-600 to-red-500 p-4">
@@ -111,6 +166,23 @@ const ChecklistPage = () => {
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
           {selectedList.name}
         </h1>
+
+        {/* Add New Task Form */}
+        <form onSubmit={handleAddTask} className="flex mb-4 gap-4">
+          <input
+            type="text"
+            value={newTaskName}
+            onChange={(e) => setNewTaskName(e.target.value)}
+            placeholder="New task name"
+            className="p-2 border rounded-md text-black"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Add Task
+          </button>
+        </form>
 
         {/* Tasks */}
         <ul className="space-y-4">

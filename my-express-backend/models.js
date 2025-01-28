@@ -33,7 +33,7 @@ const List = sequelize.define('List', {
 
 // Define Todo model
 const Todo = sequelize.define('Todo', {
-  task: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
