@@ -40,7 +40,7 @@ export default function Home() {
     },
     {
       id: 3,
-      title: "Vacation Prep",
+      title: "VacationPrep",
       tasks: 8,
       completed: 3,
       tasksList: [
