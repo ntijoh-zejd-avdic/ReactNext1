@@ -1,10 +1,11 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const ChecklistPage = () => {
   const { title } = useParams();
+  const router = useRouter();
 
   const [todoLists, setTodoLists] = useState([
     {
@@ -78,7 +79,21 @@ const ChecklistPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-600 to-red-500 p-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6">
+      {/* Header */}
+      <header className="absolute top-0 left-0 w-full bg-gray-900 text-white shadow-lg">
+        <div className="container mx-auto p-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">{selectedList.title}</h1>
+          <button
+            className="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            onClick={() => router.push("/")}
+          >
+            Back to Home
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 mt-20">
         {/* Title */}
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
           {selectedList.title}
