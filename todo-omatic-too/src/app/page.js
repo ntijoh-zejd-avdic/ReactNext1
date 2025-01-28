@@ -84,6 +84,30 @@ export default function Home() {
     router.push("/login"); // Navigate to the login page
   };
 
+  const [newListName, setNewListName] = useState('');
+  const [error, setError] = useState('');
+
+  // Handle list creation
+  const handleCreateList = async (e) => {
+    e.preventDefault();
+    if (!newListName.trim()) {
+      setError('Checklist name cannot be empty.');
+      return;
+    }
+    
+    // Create a new list object
+    const newList = {
+      id: todoLists.length + 1,
+      title: newListName,
+      tasksList: [],
+    };
+    
+    // Add new list to state
+    setTodoLists((prevLists) => [...prevLists, newList]);
+    setNewListName(''); // Clear the input
+    setError(''); // Clear any previous error
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-600 to-red-500">
       {/* Main Content */}
@@ -99,6 +123,27 @@ export default function Home() {
         </header>
 
         <main className="flex flex-col gap-8 items-center sm:items-start">
+          {/* Form to create new checklist */}
+          <form onSubmit={handleCreateList} className="flex gap-4 mt-6 mb-8">
+            <input
+              type="text"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              placeholder="Enter new checklist name"
+              className="p-2 border rounded-md text-black"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Create Checklist
+            </button>
+          </form>
+
+          {/* Display error message */}
+          {error && <p className="text-red-500">{error}</p>}
+
+          {/* Display existing checklists */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
             {todoLists.map((list) => {
               const completedCount = list.tasksList.filter(
@@ -111,9 +156,7 @@ export default function Home() {
                   key={list.id}
                   className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
                 >
-                  <h2 className="text-xl font-semibold text-white">
-                    {list.title}
-                  </h2>
+                  <h2 className="text-xl font-semibold text-white">{list.title}</h2>
                   <p className="text-gray-400">
                     {completedCount} of {totalTasks} tasks completed
                   </p>
