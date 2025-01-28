@@ -7,17 +7,21 @@ const sequelize = new Sequelize({
 });
 
 // Define User model
+// User model definition
 const User = sequelize.define('User', {
-  username: {
-    type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
+    username: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  }, {
+    timestamps: true, // Automatically manage createdAt and updatedAt
+  });
+  
 
 // Define List model
 const List = sequelize.define('List', {

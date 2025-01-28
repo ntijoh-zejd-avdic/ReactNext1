@@ -41,7 +41,7 @@ const Login = () => {
         setSuccessMessage(isLogin ? 'Login successful!' : 'Signup successful!');
         setErrorMessage('');
         // Redirect user on successful login/signup
-        router.push('/home');
+        router.push('/');
       } else {
         setErrorMessage(result.message || 'Something went wrong.');
         setSuccessMessage('');

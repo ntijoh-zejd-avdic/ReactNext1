@@ -6,6 +6,15 @@ const { sequelize, User, List, Todo } = require('./models');
 const app = express();
 const port = 3001;
 
+const cors = require('cors');
+
+// Use CORS middleware
+app.use(cors({
+  origin: 'http://localhost:3000',  // Allow requests from your React frontend
+  methods: ['GET', 'POST'],        // Allow only GET and POST requests
+}));
+
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +35,7 @@ sequelize.sync({ force: false })  // Set force: true only for fresh setups
 
 // Signup Route
 app.post('/signup', async (req, res) => {
+  console.log(`Attempting signup with body ${req.body}`)
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   
