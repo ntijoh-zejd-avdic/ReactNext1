@@ -6,50 +6,45 @@ import { useState } from "react";
 const ChecklistPage = () => {
   const { title } = useParams();
 
-  const [todoLists] = useState([
+  const [todoLists, setTodoLists] = useState([
     {
       id: 1,
       title: "Groceries",
-      tasks: 5,
-      completed: 2,
       tasksList: [
-        "Buy milk",
-        "Buy eggs",
-        "Buy bread",
-        "Buy butter",
-        "Buy cheese",
+        { name: "Buy milk", completed: false },
+        { name: "Buy eggs", completed: false },
+        { name: "Buy bread", completed: false },
+        { name: "Buy butter", completed: false },
+        { name: "Buy cheese", completed: false },
       ],
     },
     {
       id: 2,
       title: "Work",
-      tasks: 10,
-      completed: 6,
       tasksList: [
-        "Finish report",
-        "Send emails",
-        "Attend meeting",
-        "Review documents",
-        "Prepare presentation",
-        "Complete project",
+        { name: "Finish report", completed: false },
+        { name: "Send emails", completed: true },
+        { name: "Attend meeting", completed: false },
+        { name: "Review documents", completed: true },
+        { name: "Prepare presentation", completed: true },
+        { name: "Complete project", completed: true },
       ],
     },
     {
       id: 3,
       title: "VacationPrep",
-      tasks: 8,
-      completed: 3,
       tasksList: [
-        "Book flights",
-        "Reserve hotel",
-        "Buy sunscreen",
-        "Get travel insurance",
-        "Pack bags",
-        "Check itinerary",
+        { name: "Book flights", completed: true },
+        { name: "Reserve hotel", completed: false },
+        { name: "Buy sunscreen", completed: false },
+        { name: "Get travel insurance", completed: false },
+        { name: "Pack bags", completed: false },
+        { name: "Check itinerary", completed: true },
       ],
     },
   ]);
 
+  // Find the selected list based on the URL parameter
   const selectedList = todoLists.find(
     (list) => list.title.toLowerCase() === title.toLowerCase()
   );
@@ -57,6 +52,29 @@ const ChecklistPage = () => {
   if (!selectedList) {
     return <div className="text-center text-red-500">Checklist not found!</div>;
   }
+
+  // Handle checkbox toggle
+  const handleToggle = (taskIndex) => {
+    setTodoLists((prevLists) =>
+      prevLists.map((list) =>
+        list.title.toLowerCase() === title.toLowerCase()
+          ? {
+              ...list,
+              tasksList: list.tasksList.map((task, index) =>
+                index === taskIndex
+                  ? { ...task, completed: !task.completed }
+                  : task
+              ),
+            }
+          : list
+      )
+    );
+  };
+
+  // Calculate completed tasks
+  const completedCount = selectedList.tasksList.filter(
+    (task) => task.completed
+  ).length;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-600 to-red-500 p-4">
@@ -77,12 +95,14 @@ const ChecklistPage = () => {
                 type="checkbox"
                 id={`task-${index}`}
                 className="w-5 h-5 text-purple-500 border-gray-300 rounded focus:ring-purple-400"
+                checked={task.completed}
+                onChange={() => handleToggle(index)}
               />
               <label
                 htmlFor={`task-${index}`}
                 className="text-lg font-medium text-gray-700"
               >
-                {task}
+                {task.name}
               </label>
             </li>
           ))}
@@ -91,7 +111,7 @@ const ChecklistPage = () => {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            {selectedList.completed} of {selectedList.tasks} tasks completed
+            {completedCount} of {selectedList.tasksList.length} tasks completed
           </p>
         </div>
       </div>
