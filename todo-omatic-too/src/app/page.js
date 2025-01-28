@@ -9,45 +9,6 @@ export default function Home() {
   const [todoLists, setTodoLists] = useState([]);
   const token = localStorage.getItem("authToken"); // Get JWT from localStorage
 
-  // Test lists to be used when backend data is not available
-  const defaultTodoLists = [
-    {
-      id: 1,
-      title: "Groceries",
-      tasksList: [
-        { name: "Buy milk", completed: false },
-        { name: "Buy eggs", completed: false },
-        { name: "Buy bread", completed: false },
-        { name: "Buy butter", completed: false },
-        { name: "Buy cheese", completed: false },
-      ],
-    },
-    {
-      id: 2,
-      title: "Work",
-      tasksList: [
-        { name: "Finish report", completed: true },
-        { name: "Send emails", completed: true },
-        { name: "Attend meeting", completed: true },
-        { name: "Review documents", completed: true },
-        { name: "Prepare presentation", completed: true },
-        { name: "Complete project", completed: true },
-      ],
-    },
-    {
-      id: 3,
-      title: "VacationPrep",
-      tasksList: [
-        { name: "Book flights", completed: false },
-        { name: "Reserve hotel", completed: false },
-        { name: "Buy sunscreen", completed: false },
-        { name: "Get travel insurance", completed: false },
-        { name: "Pack bags", completed: false },
-        { name: "Check itinerary", completed: true },
-      ],
-    },
-  ];
-
   // Fetch todo lists from the backend
   useEffect(() => {
     async function fetchTodoLists() {
@@ -61,13 +22,13 @@ export default function Home() {
         });
         if (response.ok) {
           const data = await response.json();
+          console.log("Backend response:", data);
           setTodoLists(data); // Use backend data if available
         } else {
-          setTodoLists(defaultTodoLists); // Use test data if backend request fails
+          console.log("Found no Lists");
         }
       } catch (error) {
         console.error("Error fetching todo lists:", error);
-        setTodoLists(defaultTodoLists); // Use test data if error occurs
       }
     }
 
@@ -76,36 +37,65 @@ export default function Home() {
     }
   }, [token]);
 
-  const handleClick = (title) => {
-    router.push(`/checklist/${title.toLowerCase()}`);
+  const handleClick = (id) => {
+    router.push(`/checklist/${id}`);
   };
 
   const handleLoginClick = () => {
     router.push("/login"); // Navigate to the login page
   };
 
-  const [newListName, setNewListName] = useState('');
-  const [error, setError] = useState('');
+  const [newListName, setNewListName] = useState("");
+  const [error, setError] = useState("");
 
   // Handle list creation
   const handleCreateList = async (e) => {
     e.preventDefault();
+    console.log(`Creating list with name ${newListName}`);
+
     if (!newListName.trim()) {
-      setError('Checklist name cannot be empty.');
+      setError("Checklist name cannot be empty.");
       return;
     }
-    
+
+    // Retrieve the JWT from localStorage for authentication
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      setError("You must be logged in to create a checklist.");
+      return;
+    }
+
     // Create a new list object
     const newList = {
-      id: todoLists.length + 1,
-      title: newListName,
+      name: newListName,
       tasksList: [],
     };
-    
-    // Add new list to state
-    setTodoLists((prevLists) => [...prevLists, newList]);
-    setNewListName(''); // Clear the input
-    setError(''); // Clear any previous error
+
+    try {
+      // Send the new list to the backend
+      const response = await fetch("http://localhost:3001/lists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Add JWT to Authorization header
+        },
+        body: JSON.stringify(newList),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Add new list to the state
+        setTodoLists((prevLists) => [...prevLists, result.newList]);
+        setNewListName(""); // Clear the input
+        setError(""); // Clear any previous error
+      } else {
+        setError(result.message || "Failed to create checklist.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    }
   };
 
   return (
@@ -146,31 +136,34 @@ export default function Home() {
           {/* Display existing checklists */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
             {todoLists.map((list) => {
-              const completedCount = list.tasksList.filter(
+              const tasks = list.tasksList || []; // Default to an empty array
+              const completedCount = tasks.filter(
                 (task) => task.completed
               ).length;
-              const totalTasks = list.tasksList.length;
+              const totalTasks = tasks.length;
 
               return (
                 <div
                   key={list.id}
                   className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
                 >
-                  <h2 className="text-xl font-semibold text-white">{list.title}</h2>
+                  <h2 className="text-xl font-semibold text-white">
+                    {list.name}
+                  </h2>
                   <p className="text-gray-400">
                     {completedCount} of {totalTasks} tasks completed
                   </p>
                   <ul className="text-gray-200">
-                    {list.tasksList.slice(0, 3).map((task, index) => (
+                    {tasks.slice(0, 3).map((task, index) => (
                       <li key={index}>- {task.name}</li>
                     ))}
-                    {list.tasksList.length > 3 && <li>...</li>}
+                    {tasks.length > 3 && <li>...</li>}
                   </ul>
                   <button
                     className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    onClick={() => handleClick(list.title)}
+                    onClick={() => handleClick(list.id)}
                   >
-                    View {list.title}
+                    View {list.name}
                   </button>
                 </div>
               );

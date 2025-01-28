@@ -44,10 +44,10 @@ const Todo = sequelize.define('Todo', {
 });
 
 // Set up associations
-User.hasMany(List); // A user has many lists
-List.belongsTo(User); // A list belongs to a user
+List.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(List, { foreignKey: "userId" });
 
-List.hasMany(Todo); // A list has many todos
-Todo.belongsTo(List); // A todo belongs to a list
+List.hasMany(Todo, { as: 'tasksList', foreignKey: 'listId' });
+Todo.belongsTo(List, { as: 'List', foreignKey: 'listId' });
 
 module.exports = { sequelize, User, List, Todo };
