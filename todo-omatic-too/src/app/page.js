@@ -102,15 +102,18 @@ export default function Home() {
     <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-600 to-red-500">
       {/* Main Content */}
       <div className="grid grid-rows-[1fr] items-center justify-items-center h-full p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <header className="flex justify-between items-center w-full mb-8">
-          <h1 className="text-4xl font-bold text-white">Your To-Do Lists</h1>
+      <header className="absolute top-0 left-0 w-full bg-gray-900 text-white shadow-lg">
+        <div className="container mx-auto p-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Your To-Do Lists</h1>
           <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            className="text-sm bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
             onClick={handleLoginClick}
           >
             Go to Login
           </button>
-        </header>
+        </div>
+      </header>
+
 
         <main className="flex flex-col gap-8 items-center sm:items-start">
           {/* Form to create new checklist */}
