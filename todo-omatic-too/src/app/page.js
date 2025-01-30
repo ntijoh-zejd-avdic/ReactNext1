@@ -104,7 +104,7 @@ export default function Home() {
       <div className="grid grid-rows-[1fr] items-center justify-items-center h-full p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <header className="absolute top-0 left-0 w-full bg-gray-900 text-white shadow-lg">
         <div className="container mx-auto p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Your To-Do Lists</h1>
+          <h1 className="text-2xl font-bold">Home</h1>
           <button
             className="text-sm bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
             onClick={handleLoginClick}
