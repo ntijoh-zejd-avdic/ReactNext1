@@ -104,7 +104,7 @@ export default function Home() {
       <div className="grid grid-rows-[1fr] items-center justify-items-center h-full p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <header className="absolute top-0 left-0 w-full bg-gray-900 text-white shadow-lg">
         <div className="container mx-auto p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Your To-Do Lists</h1>
+          <h1 className="text-2xl font-bold">Home</h1>
           <button
             className="text-sm bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
             onClick={handleLoginClick}
@@ -115,34 +115,15 @@ export default function Home() {
       </header>
 
 
-        <main className="flex flex-col gap-8 items-center sm:items-start">
-          {/* Form to create new checklist */}
-          <form onSubmit={handleCreateList} className="flex gap-4 mt-6 mb-8">
-            <input
-              type="text"
-              value={newListName}
-              onChange={(e) => setNewListName(e.target.value)}
-              placeholder="Enter new checklist name"
-              className="p-2 border rounded-md text-black"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Create Checklist
-            </button>
-          </form>
+              <main className="flex flex-col items-center gap-8 w-full">
+          {/* Header in the middle of the screen */}
+          <h1 className="text-3xl font-bold font-serif text-gray-100 mt-10 sm:mt-20">Your To-Do Lists</h1>
 
-          {/* Display error message */}
-          {error && <p className="text-red-500">{error}</p>}
-
-          {/* Display existing checklists */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
+          {/* Display existing checklists above the input */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {todoLists.map((list) => {
-              const tasks = list.tasksList || []; // Default to an empty array
-              const completedCount = tasks.filter(
-                (task) => task.completed
-              ).length;
+              const tasks = list.tasksList || [];
+              const completedCount = tasks.filter((task) => task.completed).length;
               const totalTasks = tasks.length;
 
               return (
@@ -150,9 +131,7 @@ export default function Home() {
                   key={list.id}
                   className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
                 >
-                  <h2 className="text-xl font-semibold text-white">
-                    {list.name}
-                  </h2>
+                  <h2 className="text-xl font-semibold text-white">{list.name}</h2>
                   <p className="text-gray-400">
                     {completedCount} of {totalTasks} tasks completed
                   </p>
@@ -172,7 +151,28 @@ export default function Home() {
               );
             })}
           </div>
+
+          {/* Form to create a new checklist (now below the checklists) */}
+          <form onSubmit={handleCreateList} className="flex gap-4 mt-6 mb-8">
+            <input
+              type="text"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              placeholder="Enter new checklist name"
+              className="p-2 border rounded-md text-black"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Create Checklist
+            </button>
+          </form>
+
+          {/* Display error message */}
+          {error && <p className="text-red-500">{error}</p>}
         </main>
+
       </div>
     </div>
   );
