@@ -115,8 +115,51 @@ export default function Home() {
       </header>
 
 
-        <main className="flex flex-col gap-8 items-center sm:items-start">
-          {/* Form to create new checklist */}
+      <main className="flex flex-col items-center gap-8 w-full">
+
+      <div
+        className="absolute top-16 left-4 w-10 h-10 opacity-0 cursor-pointer"
+        onClick={() => window.location.href = "https://www.nexon.com/maplestory/"}
+      ></div>
+
+
+        {/* Header in the middle of the screen */}
+        <h1 className="text-3xl font-bold font-serif text-gray-100 mt-10 sm:mt-20">Your To-Do Lists</h1>
+
+        {/* Display existing checklists above the input */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {todoLists.map((list) => {
+            const tasks = list.tasksList || [];
+            const completedCount = tasks.filter((task) => task.completed).length;
+            const totalTasks = tasks.length;
+
+            return (
+              <div
+                key={list.id}
+                className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
+              >
+                <h2 className="text-xl font-semibold text-white">{list.name}</h2>
+                <p className="text-gray-400">
+                  {completedCount} of {totalTasks} tasks completed
+                </p>
+                <ul className="text-gray-200">
+                  {tasks.slice(0, 3).map((task, index) => (
+                    <li key={index}>- {task.name}</li>
+                  ))}
+                  {tasks.length > 3 && <li>...</li>}
+                </ul>
+                <button
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={() => handleClick(list.id)}
+                >
+                  View {list.name}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+          {/* Form to create a new checklist (now below the checklists) */}
           <form onSubmit={handleCreateList} className="flex gap-4 mt-6 mb-8">
             <input
               type="text"
@@ -135,43 +178,6 @@ export default function Home() {
 
           {/* Display error message */}
           {error && <p className="text-red-500">{error}</p>}
-
-          {/* Display existing checklists */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-6">
-            {todoLists.map((list) => {
-              const tasks = list.tasksList || []; // Default to an empty array
-              const completedCount = tasks.filter(
-                (task) => task.completed
-              ).length;
-              const totalTasks = tasks.length;
-
-              return (
-                <div
-                  key={list.id}
-                  className="p-4 border border-gray-300 bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition"
-                >
-                  <h2 className="text-xl font-semibold text-white">
-                    {list.name}
-                  </h2>
-                  <p className="text-gray-400">
-                    {completedCount} of {totalTasks} tasks completed
-                  </p>
-                  <ul className="text-gray-200">
-                    {tasks.slice(0, 3).map((task, index) => (
-                      <li key={index}>- {task.name}</li>
-                    ))}
-                    {tasks.length > 3 && <li>...</li>}
-                  </ul>
-                  <button
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    onClick={() => handleClick(list.id)}
-                  >
-                    View {list.name}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
         </main>
       </div>
     </div>
