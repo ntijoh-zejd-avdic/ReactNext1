@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchChecklist, updateTaskStatus, addTask } from "@/lib/api";
 import ChecklistItem from "@/components/ChecklistItem";
+import Header from "@/components/Header";
 
 const ChecklistPage = () => {
   const { name } = useParams();

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchTodoLists, createTodoList } from "@/lib/api";
 import TodoListCard from "@/components/TodoListCard";
+import Header from "@/components/Header";
 
 export default function Home() {
   const router = useRouter();
