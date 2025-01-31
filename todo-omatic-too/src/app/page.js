@@ -38,9 +38,11 @@ export default function Home() {
     const result = await Api.createList(newListName, token);
     if (!result.success)
       setError(result.message || "Failed to create checklist.");
+
     if (token) {
       Api.getLists(token)
         .then((data) => {
+          console.log("Fetched Lists:", data); // Log data to verify
           if (data) setTodoLists(data);
           else console.log("Found no Lists");
         })

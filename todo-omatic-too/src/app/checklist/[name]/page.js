@@ -29,33 +29,65 @@ const ChecklistPage = () => {
     });
   }, [name, token]);
 
-  const handleToggle = async (taskIndex) => {
+  const handleToggle = async (taskId) => {
     if (!selectedList) return;
 
-    const task = selectedList.tasksList[taskIndex];
+    const task = selectedList.tasksList.find((t) => t.id === taskId);
+    if (!task) return;
+
     const updatedCompleted = !task.completed;
 
     setSelectedList((prev) => ({
       ...prev,
-      tasksList: prev.tasksList.map((t, i) =>
-        i === taskIndex ? { ...t, completed: updatedCompleted } : t
+      tasksList: prev.tasksList.map((t) =>
+        t.id === taskId ? { ...t, completed: updatedCompleted } : t
       ),
     }));
 
-    await updateTaskStatus(selectedList.id, task.id, updatedCompleted, token);
+    await Api.updateTaskStatus(
+      selectedList.id,
+      task.id,
+      updatedCompleted,
+      token
+    );
   };
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (!newTaskName.trim()) return setError("Task name cannot be empty.");
 
+    // Optimistically update the local state before the API call
+    const newTask = { name: newTaskName, completed: false }; // Local task model
+
     setSelectedList((prev) => ({
       ...prev,
-      tasksList: [...prev.tasksList, { name: newTaskName, completed: false }],
+      tasksList: [...prev.tasksList, newTask],
     }));
 
-    await addTask(selectedList.id, newTaskName, token);
-    setNewTaskName("");
+    try {
+      // Make the API call to add the task to the backend
+      const createdTask = await Api.addTask(
+        selectedList.id,
+        newTaskName,
+        token
+      );
+
+      // If the task is successfully created on the backend, update the local state with the backend response
+      if (createdTask) {
+        setSelectedList((prev) => ({
+          ...prev,
+          tasksList: prev.tasksList.map((task) =>
+            task.name === newTaskName ? { ...task, id: createdTask.id } : task
+          ),
+        }));
+      }
+
+      // Clear the input field after adding the task
+      setNewTaskName("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+      setError("Failed to add task.");
+    }
   };
 
   if (error) return <div className="text-center text-red-500">{error}</div>;
@@ -96,12 +128,11 @@ const ChecklistPage = () => {
         </form>
 
         <ul className="space-y-4">
-          {selectedList.tasksList.map((task, index) => (
+          {selectedList.tasksList.map((task) => (
             <ChecklistItem
-              key={index}
+              key={task.id}
               task={task}
-              index={index}
-              onToggle={handleToggle}
+              onToggle={() => handleToggle(task.id)}
             />
           ))}
         </ul>
