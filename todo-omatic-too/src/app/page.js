@@ -33,12 +33,19 @@ export default function Home() {
     if (!token) return setError("You must be logged in to create a checklist.");
 
     setError("");
-    setTodoLists((prev) => [...prev, { name: newListName, tasksList: [] }]);
     setNewListName("");
 
     const result = await createTodoList(newListName, token);
     if (!result.success)
       setError(result.message || "Failed to create checklist.");
+    if (token) {
+      fetchTodoLists(token)
+        .then((data) => {
+          if (data) setTodoLists(data);
+          else console.log("Found no Lists");
+        })
+        .catch((err) => console.error("Error fetching todo lists:", err));
+    }
   };
 
   return (
@@ -56,9 +63,11 @@ export default function Home() {
             Your To-Do Lists
           </h1>
 
-          <div 
+          <div
             className="absolute top-16 left-4 w-20 h-20 opacity-0 cursor-pointer"
-            onClick={() => window.location.href = "https://www.nexon.com/maplestory/"}
+            onClick={() =>
+              (window.location.href = "https://www.nexon.com/maplestory/")
+            }
           ></div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
