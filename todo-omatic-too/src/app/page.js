@@ -56,6 +56,11 @@ export default function Home() {
             Your To-Do Lists
           </h1>
 
+          <div 
+            className="absolute top-16 left-4 w-20 h-20 opacity-0 cursor-pointer"
+            onClick={() => window.location.href = "https://www.nexon.com/maplestory/"}
+          ></div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {todoLists.map((list) => (
               <TodoListCard key={list.id} list={list} onClick={handleClick} />
