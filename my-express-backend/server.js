@@ -129,21 +129,6 @@ app.get("/lists", isAuthenticated, async (req, res) => {
   }
 });
 
-// List Routes (Authenticated)
-app.get("/lists/all", isAuthenticated, async (req, res) => {
-  try {
-    console.log(`Fetching lists for user ID: ${req.userId}`);
-    const lists = await List.findAll({
-      include: { model: Todo, as: "tasksList" },
-    });
-    console.log(`Found ${lists.length} lists`);
-    res.json(lists);
-  } catch (err) {
-    console.error("Error fetching lists:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 app.post("/lists", isAuthenticated, async (req, res) => {
   const name = req.body.name;
   console.log(`Title: ${name}`);

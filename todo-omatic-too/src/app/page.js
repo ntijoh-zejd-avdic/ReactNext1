@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { fetchTodoLists, createTodoList } from "@/lib/api";
+import Api from "@/lib/api";
 import TodoListCard from "@/components/TodoListCard";
 import Header from "@/components/Header";
 
@@ -15,7 +15,7 @@ export default function Home() {
 
   useEffect(() => {
     if (token) {
-      fetchTodoLists(token)
+      Api.getLists(token)
         .then((data) => {
           if (data) setTodoLists(data);
           else console.log("Found no Lists");
@@ -35,11 +35,11 @@ export default function Home() {
     setError("");
     setNewListName("");
 
-    const result = await createTodoList(newListName, token);
+    const result = await Api.createList(newListName, token);
     if (!result.success)
       setError(result.message || "Failed to create checklist.");
     if (token) {
-      fetchTodoLists(token)
+      Api.getLists(token)
         .then((data) => {
           if (data) setTodoLists(data);
           else console.log("Found no Lists");

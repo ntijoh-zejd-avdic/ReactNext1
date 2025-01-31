@@ -1,14 +1,16 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require("sequelize");
 
 // Set up SQLite database
 const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite',  // Database file location
+  dialect: "sqlite",
+  storage: "./database.sqlite", // Database file location
 });
 
 // Define User model
 // User model definition
-const User = sequelize.define('User', {
+const User = sequelize.define(
+  "User",
+  {
     username: {
       type: DataTypes.STRING,
       unique: true,
@@ -18,21 +20,22 @@ const User = sequelize.define('User', {
       type: DataTypes.STRING,
       allowNull: false,
     },
-  }, {
+  },
+  {
     timestamps: true, // Automatically manage createdAt and updatedAt
-  });
-  
+  }
+);
 
 // Define List model
-const List = sequelize.define('List', {
+const List = sequelize.define("List", {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
 });
 
 // Define Todo model
-const Todo = sequelize.define('Todo', {
+const Todo = sequelize.define("Todo", {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -47,7 +50,7 @@ const Todo = sequelize.define('Todo', {
 List.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(List, { foreignKey: "userId" });
 
-List.hasMany(Todo, { as: 'tasksList', foreignKey: 'listId' });
-Todo.belongsTo(List, { as: 'List', foreignKey: 'listId' });
+List.hasMany(Todo, { as: "tasksList", foreignKey: "listId" });
+Todo.belongsTo(List, { as: "List", foreignKey: "listId" });
 
 module.exports = { sequelize, User, List, Todo };

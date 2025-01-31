@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { fetchChecklist, updateTaskStatus, addTask } from "@/lib/api";
+import Api from "@/lib/api";
 import ChecklistItem from "@/components/ChecklistItem";
 import Header from "@/components/Header";
 
@@ -23,7 +23,7 @@ const ChecklistPage = () => {
       return;
     }
 
-    fetchChecklist(name, token).then((data) => {
+    Api.getChecklist(name, token).then((data) => {
       if (data) setSelectedList(data);
       else setError("Checklist not found!");
     });
